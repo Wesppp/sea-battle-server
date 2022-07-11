@@ -43,10 +43,22 @@ module.exports = class Field {
         }
       }
 
+      for (let x = cell.ship.x - 1; x < cell.ship.x + cell.ship.size * dx + dy + 1; x++) {
+        for (let y = cell.ship.y - 1; y < cell.ship.y + cell.ship.size * dy + dx + 1; y++) {
+          if (this.inField(x, y)) {
+            this.shots[x][y].status = 3
+          }
+        }
+      }
+
+      for (let i = 0; i < cell.ship.size; i++) {
+        this.shots[cell.ship.x + dx * i][cell.ship.y + dy * i].status = 4
+      }
+
       for (let i = 0; i < cell.ship.size; i++) {
         const cx = cell.ship.x + dx * i
         const cy = cell.ship.y + dy * i
-        this.shots[cx][cy].ship.killed = true 
+        this.shots[cx][cy].ship.killed = true
       }
 
       this.ships = this.ships.filter(ship => {
@@ -59,5 +71,9 @@ module.exports = class Field {
 
       return 'kill'
     }
+  }
+
+  inField(x, y) {
+    return 0 <= x && x < 10 && 0 <= y && y < 10
   }
 }
