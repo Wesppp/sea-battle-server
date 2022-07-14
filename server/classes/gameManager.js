@@ -10,8 +10,8 @@ module.exports = class GameManager {
   waitingChallenge = new Map
 
   connection(socket) {
-    const player = new Player(socket)
-    this.players.push(player)
+      const player = new Player(socket)
+      this.players.push(player)
 
     const isFree = () => {
       if (this.waitingRandomPlayers.includes(player)) { return false }
@@ -29,7 +29,6 @@ module.exports = class GameManager {
 
       player.nickname = playerData.nickname
       Object.assign(player.field, playerData.shipSet)
-      player.status = 2
     })
 
     socket.on('findRandomOpponent', () => {
@@ -115,7 +114,7 @@ module.exports = class GameManager {
     }
 
     if (player.game) {
-      await player.game.gameHistory.addAction('disconnect', player.nickname)
+      await player.game.gameHistory.addAction(player.nickname, 'disconnect')
       player.game.giveup(player)
     }
 

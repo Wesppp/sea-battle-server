@@ -12,18 +12,23 @@ const io = require('socket.io')(http, {
   }
 })
 
+const userController = require('./controllers/user-controller')
 const GameManager = require('./classes/gameManager')
 const gameManager = new GameManager()
 
 const port = 3300;
 
 const sessionMiddleware = session({
-  secret : 's3Cur3',
+  secret : 's3Cur4',
   name : 'sessionId',
 })
 
 app.set('trust proxy', 1)
 app.use(sessionMiddleware);
+
+app.post("/api/users/login", jsonParser, userController.login);
+app.post("/api/users/registration", jsonParser, userController.registration);
+app.get("/api/users/getGameHistory/:id", jsonParser, userController.getGameHistories);
 
 async function start() {
   try {

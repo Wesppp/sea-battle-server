@@ -18,20 +18,15 @@ class Game extends Observer {
 
     for (const player of [player1, player2]) {
       player.game = this
-      player.status = 1
       player.socket.emit('statusChange', 'play')
     }
 
     this.gameHistory = new GameHistory({
       playersNicknames: [player1.nickname, player2.nickname],
-      player1: {
-        nickname: player1.nickname
-      },
-      player2: {
-        nickname: player2.nickname
-      }
+      gameDate: new Date().toLocaleString(),
+      actions: []
     })    
-    this.gameHistory.start()
+    this.gameHistory.start(player1.nickname, player2.nickname)
 
     this.turnPlayer = player1
 
@@ -44,7 +39,9 @@ class Game extends Observer {
   }
 
   async stop() {
-    await this.gameHistory.finish()
+    await this.gameHistory.save()
+    await this.gameHistory.addHistiryToUsers(this.player1.nickname, this.player2.nickname)
+
     this.dispatch()
 
     this.player1.game = null
@@ -60,7 +57,8 @@ class Game extends Observer {
     player1.socket.emit('statusChange', player === player1 ? 'loser' : 'winner')
     player2.socket.emit('statusChange', player === player2 ? 'loser' : 'winner')
 
-    await this.gameHistory.giveup(player === player1 ? 'giveup' : 'win', player === player2 ? 'giveup' : 'win')
+    await this.gameHistory.giveup({player: player1.nickname, act: player === player1 ? 'giveup' : 'winner'},
+      {player: player2.nickname, act: player === player2 ? 'giveup' : 'winner'})
 
     this.stop()
   }
@@ -74,13 +72,13 @@ class Game extends Observer {
         player2.socket.emit('updateField', this.nextPlayer.field)
 
         if (result === 'hit') {
-          await this.gameHistory.addAction('hit', this.turnPlayer.nickname)
+          await this.gameHistory.addAction(this.turnPlayer.nickname, 'hit')
         } else if (result === 'kill') {
-          await this.gameHistory.addAction('kill', this.turnPlayer.nickname)
+          await this.gameHistory.addAction(this.turnPlayer.nickname, 'kill')
         }
 
       if (result === 'miss') {
-        await this.gameHistory.addAction('miss', this.turnPlayer.nickname)
+        await this.gameHistory.addAction(this.turnPlayer.nickname, 'miss')
         this.turnPlayer = this.nextPlayer
         this.toggleTurn()
       }
@@ -90,21 +88,18 @@ class Game extends Observer {
       player1.socket.emit('statusChange', player1.loser ? 'loser' : 'winner')
       player2.socket.emit('statusChange', player2.loser ? 'loser' : 'winner')
 
-      await this.gameHistory.result(player1.loser ? 'loser' : 'winner', player2.loser ? 'loser' : 'winner')
-
-      player1.status = 0
-      player2.status = 0
+      await this.gameHistory.finish({player: player1.nickname, act: player1.loser ? 'loser' : 'winner'},
+      {player: player2.nickname, act: player2.loser ? 'loser' : 'winner'})
 
       this.stop()
     }
   }
 
-  sendMessage(message, player) {
+  async sendMessage(message, player) {
     const {player1, player2} = this
 
+    await this.gameHistory.addAction(player.nickname, `${message}(message)`)
     message = `${new Date().toLocaleTimeString()}: ${message}`
-
-    this.gameHistory.addAction('send message', player.nickname)
 
     player1.socket.emit('message', message)
     player2.socket.emit('message', message)

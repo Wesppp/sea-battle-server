@@ -2,7 +2,6 @@ const Field = require('./field')
 
 module.exports = class Player {
   socket = null
-  status = null
   field = null
   shipsArray = []
   game = null
@@ -12,17 +11,15 @@ module.exports = class Player {
     this.field = new Field()
     this.shipsArray = []
     this.socket = socket
-    this.status = 0
   }
 
   resetField() {
     this.field = new Field()
     this.shipsArray = []
-    this.status = 0
   }
 
   get ready() {
-    return this.status === 2 && !this.game && this.socket
+    return !this.game && this.socket
   }
 
   get loser() {
