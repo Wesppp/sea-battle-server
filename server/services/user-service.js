@@ -16,7 +16,7 @@ exports.login = async function (loginUser) {
   
   try {
     if (existUser.length) {
-      let token = jwt.sign(existUser[0].toJSON(), JWT_Secret)
+      let token = jwt.sign(existUser[0].toJSON(), JWT_Secret, {expiresIn: '1h'})
       return {signed_user: existUser[0], token: token}
     } else {
       throw new ReferenceError('There is no such user')
