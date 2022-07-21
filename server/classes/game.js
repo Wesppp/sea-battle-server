@@ -88,6 +88,9 @@ class Game extends Observer {
       player1.socket.emit('statusChange', player1.loser ? 'loser' : 'winner')
       player2.socket.emit('statusChange', player2.loser ? 'loser' : 'winner')
 
+      this.player1.socket.emit('showShips')
+      this.player2.socket.emit('showShips')
+
       await this.gameHistory.finish({player: player1.nickname, act: player1.loser ? 'loser' : 'winner'},
       {player: player2.nickname, act: player2.loser ? 'loser' : 'winner'})
 

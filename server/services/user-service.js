@@ -47,10 +47,20 @@ exports.registration = async function (newUser) {
   }
 }
 
-exports.getGameHistories = async function(id) {
-  const user = await User.findById(id)
+exports.getGameHistories = async function(userId) {
+  const user = await User.findById(userId)
     .populate('gameHistories.items.gameHistoryId')
 
-  let gameHistories = mapUserItems(user.gameHistories, 'gameHistoryId')
-  return gameHistories
+  let gameHistories = mapUserItems(user.gameHistories, 'gameHistoryId').reverse()
+  return gameHistories.slice(0, 3)
+}
+
+exports.getGameHistoriesChunk = async function(userId, lastHistoryId) {
+  const user = await User.findById(userId)
+    .populate('gameHistories.items.gameHistoryId')
+
+  let gameHistories = mapUserItems(user.gameHistories, 'gameHistoryId').reverse() 
+  let lastHistoryIndex = gameHistories.findIndex(history => history._id.toString() === lastHistoryId)
+
+  return gameHistories.slice(++lastHistoryIndex, lastHistoryIndex + 3)
 }

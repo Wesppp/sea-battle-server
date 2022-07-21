@@ -29,6 +29,7 @@ app.use(sessionMiddleware);
 app.post("/api/users/login", jsonParser, userController.login);
 app.post("/api/users/registration", jsonParser, userController.registration);
 app.get("/api/users/getGameHistory/:id", jsonParser, userController.getGameHistories);
+app.get("/api/users/getGameHistoryChunk/:userId/:historyId", jsonParser, userController.getGameHistoriesChunk);
 
 async function start() {
   try {

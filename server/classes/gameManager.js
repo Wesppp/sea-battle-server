@@ -93,6 +93,28 @@ module.exports = class GameManager {
       }
     })
 
+    socket.on('cancelGame', () => {
+      const player = this.players.find(player => player.socket === socket)
+
+      if (!player) {
+        return
+      }
+
+      if (this.waitingRandomPlayers.includes(player)) {
+        const index = this.waitingRandomPlayers.indexOf(player)
+        this.waitingRandomPlayers.splice(index, 1)
+      }
+  
+      const values = Array.from(this.waitingChallenge.values())
+
+      if (values.includes(player)) {
+        const i = values.indexOf(player)
+        const keys = Array.from(this.waitingChallenge.keys())
+        const key = keys[i]
+        this.waitingChallenge.delete(key)
+      }
+    })
+
     socket.on('addShot', (shot) => {
       if (player.game) {
         player.game.addShot(shot)
@@ -125,7 +147,7 @@ module.exports = class GameManager {
 
     const values = Array.from(this.waitingChallenge.values())
 
-    if (values.includes.player) {
+    if (values.includes(player)) {
       const i = values.indexOf(player)
       const keys = Array.from(this.waitingChallenge.keys())
       const key = keys[i]

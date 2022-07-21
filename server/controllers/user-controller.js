@@ -25,6 +25,16 @@ exports.getGameHistories = async function(req, res) {
       res.send(gameHistories)
   } catch(e) {
       console.log(e)
-      res.status(404).send()
+      res.send(e)
+  }
+}
+
+exports.getGameHistoriesChunk = async function(req, res) {
+  try {
+    const gameHistoriesChunk = await userService.getGameHistoriesChunk(req.params.userId, req.params.historyId)
+    res.send(gameHistoriesChunk)
+  } catch(e) {
+    console.log(e);
+    res.send(e)
   }
 }
