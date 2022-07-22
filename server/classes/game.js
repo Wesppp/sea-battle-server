@@ -41,6 +41,8 @@ class Game extends Observer {
   async stop() {
     await this.gameHistory.save()
     await this.gameHistory.addHistiryToUsers(this.player1.nickname, this.player2.nickname)
+    this.player1.socket.emit('showShips', this.player2.field)
+    this.player2.socket.emit('showShips', this.player1.field)
 
     this.dispatch()
 
@@ -87,9 +89,6 @@ class Game extends Observer {
     if (player1.loser || player2.loser) {
       player1.socket.emit('statusChange', player1.loser ? 'loser' : 'winner')
       player2.socket.emit('statusChange', player2.loser ? 'loser' : 'winner')
-
-      this.player1.socket.emit('showShips')
-      this.player2.socket.emit('showShips')
 
       await this.gameHistory.finish({player: player1.nickname, act: player1.loser ? 'loser' : 'winner'},
       {player: player2.nickname, act: player2.loser ? 'loser' : 'winner'})
