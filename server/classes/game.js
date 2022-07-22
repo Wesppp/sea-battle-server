@@ -39,10 +39,8 @@ class Game extends Observer {
   }
 
   async stop() {
-    await this.gameHistory.save()
-    await this.gameHistory.addHistiryToUsers(this.player1.nickname, this.player2.nickname)
-    this.player1.socket.emit('showShips', this.player2.field)
-    this.player2.socket.emit('showShips', this.player1.field)
+    await this.saveGameHistory()
+    await this.showOpponentShips()
 
     this.dispatch()
 
@@ -105,6 +103,16 @@ class Game extends Observer {
 
     player1.socket.emit('message', message)
     player2.socket.emit('message', message)
+  }
+
+  async showOpponentShips () {
+    await this.player1.socket.emit('showShips', this.player2.field)
+    await this.player2.socket.emit('showShips', this.player1.field)
+  }
+
+  async saveGameHistory() {
+    await this.gameHistory.save()
+    await this.gameHistory.addHistiryToUsers(this.player1.nickname, this.player2.nickname)
   }
 }
 
