@@ -55,6 +55,6 @@ io.on('connection', (socket) => {
 
   socket.on('disconnect', () => {
     gameManager.disconnect(socket)
-    io.emit('playersCount', io.engine.clientsCount)
+    io.emit('playersCount', gameManager.players.length)
   })
 });

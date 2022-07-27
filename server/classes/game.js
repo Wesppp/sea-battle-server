@@ -19,6 +19,7 @@ class Game extends Observer {
     for (const player of [player1, player2]) {
       player.game = this
       player.socket.emit('statusChange', 'play')
+      player.socket.emit('opponentNickname', player === player1 ? player2.nickname : player1.nickname)
     }
 
     this.gameHistory = new GameHistory({

@@ -7,6 +7,6 @@ module.exports = class Cell {
   constructor(x, y) {
     this.x = x
     this.y = y
-    this.status = 1
+    this.status = 'free'
   }
 }

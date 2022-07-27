@@ -136,7 +136,10 @@ module.exports = class GameManager {
     }
 
     if (player.game) {
+      const {player1, player2} = player.game
       await player.game.gameHistory.addAction(player.nickname, 'disconnect')
+      player1.socket.emit('disconnected')
+      player2.socket.emit('disconnected')
       player.game.giveup(player)
     }
 

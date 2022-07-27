@@ -21,13 +21,13 @@ module.exports = class Field {
   addShot(shot) {
     const cell = this.shots[shot.x][shot.y]
 
-    if (cell.status === 0 || cell.status === 1) {
-      cell.status = 3
+    if (cell.status === 'closed' || cell.status === 'free') {
+      cell.status = 'miss'
       return 'miss'
     }
 
-    if (cell.status === 2) {
-      cell.status = 4
+    if (cell.status === 'ship') {
+      cell.status = 'hit'
       cell.ship.hit++
 
       const dy = cell.ship.direction === 'row'
@@ -59,13 +59,13 @@ module.exports = class Field {
     for (let x = ship.x - 1; x < ship.x + ship.size * dx + dy + 1; x++) {
       for (let y = ship.y - 1; y < ship.y + ship.size * dy + dx + 1; y++) {
         if (this.inField(x, y)) {
-          this.shots[x][y].status = 3
+          this.shots[x][y].status = 'miss'
         }
       }
     }
 
     for (let i = 0; i < ship.size; i++) {
-      this.shots[ship.x + dx * i][ship.y + dy * i].status = 4
+      this.shots[ship.x + dx * i][ship.y + dy * i].status = 'hit'
     }
 
     for (let i = 0; i < ship.size; i++) {

@@ -18,10 +18,6 @@ module.exports = class Player {
     this.shipsArray = []
   }
 
-  get ready() {
-    return !this.game && this.socket
-  }
-
   get loser() {
     for (const ship of this.field.ships) {
       if (!ship.killed) {
