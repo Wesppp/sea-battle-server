@@ -1,7 +1,8 @@
-const Observer = require('./observer')
+const Observable = require('./observable')
 const GameHistory = require('../models/game-history')
+const gameActions = require('../enums/gameActions')
 
-class Game extends Observer {
+class Game extends Observable {
   player1 = null
   player2 = null
 
@@ -55,11 +56,11 @@ class Game extends Observer {
   async giveup(player) {
     const {player1, player2} = this
 
-    player1.socket.emit('statusChange', player === player1 ? 'loser' : 'winner')
-    player2.socket.emit('statusChange', player === player2 ? 'loser' : 'winner')
+    player1.socket.emit('statusChange', player === player1 ? gameActions.loser : gameActions.winner)
+    player2.socket.emit('statusChange', player === player2 ? gameActions.loser : gameActions.winner)
 
-    await this.gameHistory.giveup({player: player1.nickname, act: player === player1 ? 'giveup' : 'winner'},
-      {player: player2.nickname, act: player === player2 ? 'giveup' : 'winner'})
+    await this.gameHistory.giveup({player: player1.nickname, act: player === player1 ? gameActions.giveup : gameActions.winner},
+      {player: player2.nickname, act: player === player2 ? gameActions.giveup : gameActions.winner})
 
     this.stop()
   }
@@ -72,25 +73,25 @@ class Game extends Observer {
         player1.socket.emit('updateField', this.nextPlayer.field)
         player2.socket.emit('updateField', this.nextPlayer.field)
 
-        if (result === 'hit') {
-          await this.gameHistory.addAction(this.turnPlayer.nickname, 'hit')
-        } else if (result === 'kill') {
-          await this.gameHistory.addAction(this.turnPlayer.nickname, 'kill')
+        if (result === gameActions.hit) {
+          await this.gameHistory.addAction(this.turnPlayer.nickname, gameActions.hit)
+        } else if (result === gameActions.kill) {
+          await this.gameHistory.addAction(this.turnPlayer.nickname, gameActions.kill)
         }
 
-      if (result === 'miss') {
-        await this.gameHistory.addAction(this.turnPlayer.nickname, 'miss')
+      if (result === gameActions.miss) {
+        await this.gameHistory.addAction(this.turnPlayer.nickname, gameActions.miss)
         this.turnPlayer = this.nextPlayer
         this.toggleTurn()
       }
     }
 
     if (player1.loser || player2.loser) {
-      player1.socket.emit('statusChange', player1.loser ? 'loser' : 'winner')
-      player2.socket.emit('statusChange', player2.loser ? 'loser' : 'winner')
+      player1.socket.emit('statusChange', player1.loser ? gameActions.loser : gameActions.winner)
+      player2.socket.emit('statusChange', player2.loser ? gameActions.loser : gameActions.winner)
 
-      await this.gameHistory.finish({player: player1.nickname, act: player1.loser ? 'loser' : 'winner'},
-      {player: player2.nickname, act: player2.loser ? 'loser' : 'winner'})
+      await this.gameHistory.finish({player: player1.nickname, act: player1.loser ? gameActions.loser : gameActions.winner},
+      {player: player2.nickname, act: player2.loser ? gameActions.loser : gameActions.winner})
 
       this.stop()
     }

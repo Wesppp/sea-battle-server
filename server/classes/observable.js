@@ -1,4 +1,4 @@
-module.exports = class Observer {
+module.exports = class Observable {
   watchers = new Set()
 
   subscribe(watcher) {

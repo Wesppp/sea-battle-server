@@ -1,4 +1,5 @@
 const Cell = require('./cell')
+const gameActions = require('../enums/gameActions')
 
 module.exports = class Field {
   shots = []
@@ -22,12 +23,12 @@ module.exports = class Field {
     const cell = this.shots[shot.x][shot.y]
 
     if (cell.status === 'closed' || cell.status === 'free') {
-      cell.status = 'miss'
-      return 'miss'
+      cell.status = gameActions.miss
+      return gameActions.miss
     }
 
     if (cell.status === 'ship') {
-      cell.status = 'hit'
+      cell.status = gameActions.hit
       cell.ship.hit++
 
       const dy = cell.ship.direction === 'row'
@@ -39,12 +40,12 @@ module.exports = class Field {
         const ship = this.shots[cx][cy].ship 
 
         if (ship.hit === 0) {
-          return 'hit'
+          return gameActions.hit
         }
       }
 
       this.killShip(cell.ship)
-      return 'kill'
+      return gameActions.kill
     }
   }
 
@@ -59,13 +60,13 @@ module.exports = class Field {
     for (let x = ship.x - 1; x < ship.x + ship.size * dx + dy + 1; x++) {
       for (let y = ship.y - 1; y < ship.y + ship.size * dy + dx + 1; y++) {
         if (this.inField(x, y)) {
-          this.shots[x][y].status = 'miss'
+          this.shots[x][y].status = gameActions.miss
         }
       }
     }
 
     for (let i = 0; i < ship.size; i++) {
-      this.shots[ship.x + dx * i][ship.y + dy * i].status = 'hit'
+      this.shots[ship.x + dx * i][ship.y + dy * i].status = gameActions.hit
     }
 
     for (let i = 0; i < ship.size; i++) {

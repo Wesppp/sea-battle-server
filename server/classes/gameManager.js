@@ -1,6 +1,7 @@
 const Game = require("./game")
 const Player = require("./player")
 const { getRandomString } = require('../shared/additional')
+const gameActions = require('../enums/gameActions')
 
 module.exports = class GameManager {
   players = []
@@ -10,8 +11,8 @@ module.exports = class GameManager {
   waitingChallenge = new Map
 
   connection(socket) {
-      const player = new Player(socket)
-      this.players.push(player)
+    const player = new Player(socket)
+    this.players.push(player)
 
     const isFree = () => {
       if (this.waitingRandomPlayers.includes(player)) { return false }
@@ -129,6 +130,7 @@ module.exports = class GameManager {
   }
 
   async disconnect(socket) {
+
     const player = this.players.find(player => player.socket === socket)
   
     if (!player) {
@@ -137,7 +139,7 @@ module.exports = class GameManager {
 
     if (player.game) {
       const {player1, player2} = player.game
-      await player.game.gameHistory.addAction(player.nickname, 'disconnect')
+      await player.game.gameHistory.addAction(player.nickname, gameActions.disconnect)
       player1.socket.emit('disconnected')
       player2.socket.emit('disconnected')
       player.game.giveup(player)
@@ -176,5 +178,9 @@ module.exports = class GameManager {
     this.players.splice(index, 1)
     
     return true
+  }
+
+  get playersOnline() {
+    return this.players.length
   }
 }
